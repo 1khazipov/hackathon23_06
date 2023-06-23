@@ -20,4 +20,5 @@ from myapp import views
 
 urlpatterns = [
     path('get/', views.get_data, name='get_data'),
+    path('get/<slug:id>/', views.download_side_effect)
 ]
