@@ -1,0 +1,64 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/adaptive.index.css' %}" />
+    <title>AI</title>
+</head>
+<body>
+    <div id="root" class>
+        <div class="container">
+            <div class="card">
+                <div class="card-content-container">
+                    <!-- search bar -->
+                    <div class="searchbar-container">
+                        <div class="searchbar-elems">
+                            <form class="form" method="post" action="{% url 'get_data' %}">
+                                {% csrf_token %}
+                            <input style="width: 70%" name="link" type="text" placeholder="youtube video link here" class="searchbar-field"/>
+                            <button type="submit" class="button">search</button>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <hr>
+                    <div figure="rectangle"></div>
+                </div>
+                <div class="card-content-container">
+                    <div class="source-link">
+                        <!-- source link -->
+                        <h3 class="about">Service for <a class="link" href="https://youtube.com">Youtube</a> video trancription.</h3>
+                        <span class="resctrictions">We process videos with duration under 10 min</span>
+                        <h4 class="status">Transcription for video: <span><a class="link" href="#">Котики</a></span></h4>
+                    </div>
+                        <!-- loading symbol -->
+                    <div>
+                        <iframe class="iframe" width="100%" height="315"
+                        src="https://www.youtube.com/embed/{{ id }}">
+                        </iframe>
+                    </div>
+
+                    <div id="content">
+                        <h3>Text</h3>
+                        <p>{{ id }}</p>
+                        <img class="screenshot" alt="makima" src="path/{{ img_number }}"/>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" defer>
+        window.onload = () => {
+            if(pageYOffset < 50){
+                document.getElementById("root").classList.add("page");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+.screenshot {
+    width: 100%;
+    height: auto;
+}
+
+.status {
+    margin-bottom: 10px;
+}
+
+.link {
+    color: #4983c6
+}
+
+.about {
+    margin: 0px;
+}
+
+/* .restrictions {
+
+} */
+
+.source-link {
+    min-height: 80px;
+    margin-top: 50px;
+    padding: 10px 20px;
+    
+    background-color: #9CC08B;    
+    color: white;
+}
+
+.card-content-container {
+    margin: 0 50px;
+}
+
+.searchbar-elems {
+    /*display: flex;*/
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button:hover, .button:focus-visible {
+    background-color: #4983c6;
+    outline: initial;
+}
+
+.button {
+    background-color: #75A6DF;
+    color: white;
+    border: none;
+    width: 20%;
+    height: 30px;
+    margin-left: 10px;
+}
+
+.searchbar-field:hover, .searchbar-field:focus, .searchbar-field:focus-visible {
+    border-color: #67afd9;
+    outline: initial;
+    float: left;
+}
+
+.searchbar-field {
+    height: 30px;
+    width: 80%;
+    border: 2px solid #77CEFF;
+    border-radius: 7px;
+    padding: 0 5px;
+    float: left;
+}
+
+.searchbar-container {
+    padding-top: 50px;
+}
+
+.card {
+    background-color: white;
+    width: auto;
+    min-height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    padding-bottom: 20px;
+    border-radius: 30px 30px 0 0;
+    box-shadow: #1e1e1ec4 0px 30px 20px 0px;
+}
+
+div[figure="rectangle"] {
+    width: 20%;
+    max-width: 160px;
+    height: 8px;
+    background-color: #9d9b9b;
+    margin-top: -9px;
+}
+
+.container {
+    /* 2 из 12 */
+    margin: 0 240px;
+    align-content: center;
+}
+
+p {
+    text-indent: 30px;
+    text-align: justify;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #C5C5C5;
+    color: #1E1E1E;
+    font-family: open sans-serif;
+}
+
+.page {
+    animation: show 1s ease forwards;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+@keyframes show {
+    from {
+        top:200px
+    }
+    to {
+        top: 0
+    }
+}
