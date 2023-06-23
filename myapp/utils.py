@@ -5,7 +5,7 @@ from .Exceptions.exceptions import ResourceUnavailableException
 def download_yotube_video(url, destination):
     youtube = pytube.YouTube(url)
     details = youtube.vid_info['videoDetails']
-    if youtube.vid_info['playabilityStatus']['status'] != 'OK' or details['isPrivate']:
+    if details['isPrivate']:
         raise ResourceUnavailableException()
 
     id = details['videoId']  # or video.download().video_id
