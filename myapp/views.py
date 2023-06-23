@@ -18,11 +18,12 @@ async def download_side_effect(request, id):
     if request.method == 'GET':
         # todo: обработать если не будет линки
         link = 'https://youtube.com/watch?v='+id
-        context = None
         try:
             info = await download_yotube_video_async(link, './Downloads')
+            context = {"details": info}
         except ResourceUnavailableException:
             context = {"error": "video is unavailable"}
+
         return render(request, 'index.html', context)
     elif request.method == 'POST':
         text = request.POST.get('link')

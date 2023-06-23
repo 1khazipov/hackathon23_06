@@ -30,11 +30,17 @@
                     <div figure="rectangle"></div>
                 </div>
                 <div class="card-content-container">
-                    <div class="source-link">
+                    <div class="source-link" {% if error %} style="background-color:red" {% endif %}>
                         <!-- source link -->
-                        <h3 class="about">Service for <a class="link" href="https://youtube.com">Youtube</a> video trancription.</h3>
+                        <h3 class="about">Сервис для анализа видео с платформы <a class="link" href="https://youtube.com">Youtube</a>.</h3>
                         <span class="resctrictions">We process videos with duration under 10 min</span>
-                        <h4 class="status">Transcription for video: <span><a class="link" href="#">Котики</a></span></h4>
+                        <h4 class="status">
+                            {% if error %}
+                                {{error}}
+                            {% else %}
+                                Расшифровка: <span><a class="link" href="#">{{details.title}}</a></span>
+                            {% endif %}
+                        </h4>
                     </div>
                     собачки
                         <!-- loading symbol -->

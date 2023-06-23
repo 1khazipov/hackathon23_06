@@ -247,7 +247,10 @@ cython_debug/
 
 # Cython debug symbols
 
-.idea
+.idea/
+
+__pycache__/
+
 ### Python Patch ###
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
 poetry.toml
