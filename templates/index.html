@@ -16,10 +16,10 @@
                     <!-- search bar -->
                     <div class="searchbar-container">
                         <div class="searchbar-elems">
-                            <form class="form" method="post" action="{% url 'get_data' %}">
-                                {% csrf_token %}
-                            <input style="width: 70%" name="link" type="text" placeholder="youtube video link here" class="searchbar-field"/>
-                            <button type="submit" class="button">search</button>
+                            <form class="form" method="get" action="{% url 'get_data' %}">
+                            <input style="width: 70%" name="link" type="text" placeholder="youtube video link here" class="searchbar-field"
+                            {% if details %} value="{{details.link}}" {% endif %}/>
+                            <button type="submit" class="button">Поиск</button>
                             </form>
                             <br>
                         </div>
@@ -38,17 +38,19 @@
                             {% if error %}
                                 {{error}}
                             {% else %}
-                                Расшифровка: <span><a class="link" href="#">{{details.title}}</a></span>
+                                Расшифровка: <span><a class="link" href="{{details.link}}">{{details.title}}</a></span>
                             {% endif %}
                         </h4>
                     </div>
                     собачки
                         <!-- loading symbol -->
+                    {% if details %}
                     <div>
                         <iframe class="iframe" width="100%" height="315"
-                        src="https://www.youtube.com/embed/{{ id }}">
+                        src="https://www.youtube.com/embed/{{ details.id }}">
                         </iframe>
                     </div>
+                    {% endif %}
 
                     <div id="content">
                         <h3>Text</h3>

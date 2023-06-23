@@ -1,25 +1,7 @@
 import pytube
 import asyncio
+import os.path
 from .Exceptions.exceptions import ResourceUnavailableException
-
-def download_yotube_video(url, destination):
-    youtube = pytube.YouTube(url)
-    details = youtube.vid_info['videoDetails']
-    if details['isPrivate']:
-        raise ResourceUnavailableException()
-
-    id = details['videoId']  # or video.download().video_id
-    title = details['title']
-
-    # todo: среднее качесвто 720 или 1080 на выбор
-    video = youtube.streams.get_highest_resolution()
-    video.download(destination)
-
-    return {
-        'id': id,
-        'title': title,
-        'directory': destination
-    }
 
 
 async def download_yotube_video_async(url, destination):
@@ -35,15 +17,22 @@ async def download_yotube_video_async(url, destination):
 
     id = details['videoId'] #or video.download().video_id
     title = details['title']
+    destination = os.path.join(destination, id)
+    if not os.path.exists(destination):
+        print("зашел сюда")
+        #todo: среднее качесвто 720 или 1080 на выбор
+        video = youtube.streams.filter(progressive=True, file_extension='mp4', resolution='720p')\
+                           .order_by('resolution').first()
+        if not video:
+            raise ResourceUnavailableException()
 
-    #todo: среднее качесвто 720 или 1080 на выбор
-    video = youtube.streams.get_highest_resolution()
-    def download_async():
-        return video.download(destination)
-    await loop.run_in_executor(None, download_async)
+        def download_async():
+            return video.download(destination)
+        await loop.run_in_executor(None, download_async)
 
     return {
         'id': id,
         'title': title,
-        'directory': destination
+        'link': url,
+        'directory': destination+id
     }

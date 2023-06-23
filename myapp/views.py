@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import re
 from .utils import *
+from django.views.generic import TemplateView
 
 def extract_video_id(url):
     regex = r"(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|https?:\/\/(?:www\.)?youtu\.be\/)([a-zA-Z0-9_-]{11})"
@@ -12,12 +13,14 @@ def extract_video_id(url):
         return video_id
     else:
         return None
+def is_valid(url):
+    return True
 
-
-async def download_side_effect(request, id):
-    if request.method == 'GET':
-        # todo: обработать если не будет линки
-        link = 'https://youtube.com/watch?v='+id
+async def download_side_effect(request):
+    if request.method == 'GET' and request.GET.get("link"):
+        link = request.GET.get("link")
+        if not is_valid(link):
+            return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
             info = await download_yotube_video_async(link, './Downloads')
             context = {"details": info}
@@ -25,19 +28,6 @@ async def download_side_effect(request, id):
             context = {"error": "video is unavailable"}
 
         return render(request, 'index.html', context)
-    elif request.method == 'POST':
-        text = request.POST.get('link')
-        video_id = extract_video_id(text)
-        return render(request, 'index.html', {'id': video_id})
     else:
         return render(request, 'index.html')
 
-def get_data(request):
-    if request.method == 'GET':
-        return render(request, 'index.html')
-    elif request.method == 'POST':
-        text = request.POST.get('link')
-        video_id = extract_video_id(text)
-        return render(request, 'index.html', {'id': video_id})
-    else:
-        return render(request, 'index.html')
