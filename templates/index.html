@@ -42,7 +42,6 @@
                             {% endif %}
                         </h4>
                     </div>
-                    собачки
                         <!-- loading symbol -->
                     {% if details %}
                     <div>
@@ -52,11 +51,16 @@
                     </div>
                     {% endif %}
 
-                    <div id="content">
-                        <h3>Text</h3>
-                        <p>{{ id }}</p>
-                        <img class="screenshot" alt="makima" src="path/{{ img_number }}"/>
                     </div>
+                  {% for subtitle, timecode, text, path in zipped_data %}
+                    <div class="subtitle" id="content">
+                        <h2>{{ subtitle }}</h2>
+                        <h3>{{ timecode }}</h3>
+                        <p>{{ text }}</p>
+                        <img class="screenshot" alt="" src="path/{{ path }}"/>
+                    </div>
+                  {% endfor %}
+                </div>
 
                 </div>
             </div>
