@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import re
 from .utils import *
 
@@ -12,6 +12,7 @@ def extract_video_id(url):
         return video_id
     else:
         return None
+
 def is_valid(url):
     return True
 
@@ -22,6 +23,9 @@ async def download_side_effect(request):
             return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
             info = await download_yotube_video_async(link, './Downloads')
+            cached = await MLPipeLineService().register_computation_task_async()
+            if cached:
+                return redirect("fdg")
             context = {"details": info}
         except ResourceUnavailableException:
             context = {"error": "video is unavailable"}
@@ -29,6 +33,14 @@ async def download_side_effect(request):
         return render(request, 'index.html', context)
     else:
         return render(request, 'index.html')
+
+async def get_operation_status(request, id):
+    '''
+    todo: смотреть статус операции и возвращать
+    {status: "pending", come_again: 30sec}
+    {status: "completed", view_at: "link"}
+    {status: "unregistered"}
+    '''
 
 
 def string_to_array(string):

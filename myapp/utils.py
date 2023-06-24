@@ -1,7 +1,15 @@
+import time
+
 import pytube
 import asyncio
 import os.path
 from .Exceptions.exceptions import ResourceUnavailableException
+
+class MLPipeLineService:
+     async def register_computation_task_async(self) -> bool:
+        #todo: начинать бэкграунд обработку или говорить, что в кжше уже есть данные.
+        time.sleep(30)
+        return True
 
 
 async def download_yotube_video_async(url, destination):
