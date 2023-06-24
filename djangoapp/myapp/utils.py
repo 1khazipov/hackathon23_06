@@ -16,7 +16,7 @@ class MLPipeLineService:
         return False
 
 
-async def download_youtube_video_async(url, destination):
+async def download_youtube_video_async(url,id, destination):
     loop = asyncio.get_event_loop()
 
     #todo: convert to lambda
@@ -57,7 +57,7 @@ async def download_youtube_video_async(url, video_id, destination):
 
     #youtube = await loop.run_in_executor(None, do_async)
     #details = youtube.vid_info['videoDetails']
-    details = {'videoId':video_id, 'title': "ffff"}
+    details = {'videoId':video_id, 'title': ""}
     #if details['isLiveContent'] or details['isPrivate']:
     #    raise ResourceUnavailableException()
     #pytube.cipher.get_throttling_function_name =
@@ -72,6 +72,8 @@ async def download_youtube_video_async(url, video_id, destination):
         #    raise ResourceUnavailableException()
 
         def download_async():
+            #todo: удалить return
+            return
             ydl_opts = {
                 # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                 'format': 'best[ext=mp4]',

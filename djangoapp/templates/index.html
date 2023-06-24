@@ -52,14 +52,22 @@
                     {% endif %}
 
                     </div>
+                <style>
+                    .editableContent {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+                </style>
+                {% if zipped_data %}
                   {% for subtitle, timecode, text, path in zipped_data %}
-                    <div class="subtitle" id="content">
+                    <div class="subtitle" id="content" contenteditable="true"  class="editableContent">
                         <h2>{{ subtitle }}</h2>
                         <h3>{{ timecode }}</h3>
                         <p>{{ text }}</p>
                         <img class="screenshot" alt=""  src="{% static 'frames/' %}{{ path }}"/>
                     </div>
                   {% endfor %}
+                {% endif %}
                 </div>
 
                 </div>
