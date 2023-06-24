@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import re
+import re, os
 from .utils import *
 
 
@@ -43,6 +43,7 @@ subtitle = 'a1\na2\na3\na4'
 timecodes = '[00:00-01:01]\n[01:01-02:21]\n[02:21-03:01]\n[03:01-03:11]'
 texts = 't1\nt2\nt3\nt4'
 paths = 'p1\np2\np3\np4'
+frames = os.listdir("static/frames")
 
 
 def get_data(request):
@@ -55,7 +56,7 @@ def get_data(request):
             string_to_array(subtitle),
             string_to_array(timecodes),
             string_to_array(texts),
-            string_to_array(paths))
+            frames)
         return render(request, 'index.html', {'id': video_id, 'zipped_data': zipped_data})
     else:
         return render(request, 'index.html')
