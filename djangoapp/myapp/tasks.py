@@ -18,5 +18,4 @@ def ml_pipeline(url, id, **kwargs):
     except:
         cache.delete(key)
 
-    time.sleep(15)
     cache.set(f'{id}_status', {'status':'ready'})

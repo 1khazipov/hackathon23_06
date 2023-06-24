@@ -3,6 +3,7 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from .utils import *
 import json
+import threading
 
 
 def tryParseFloat(value):
@@ -33,21 +34,21 @@ def get_model_params(get):
 
 async def download_side_effect(request):
     if request.method == 'POST':
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         # x = request.GET.get("x")
         # y = request.GET.get("y")
         # z = int(request.GET.get("z"))
         link = request.POST.get("link")  # link
         video_id = extract_video_id(link)  # id
-
+        print(link)
+        print(video_id)
         if not video_id:
             return render(request, 'index.html', {'error': 'Не ты ссылка'})
         try:
             kwargs = {}  # get_model_params(request.GET)
             # todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
-            info = await download_youtube_video_async(link, video_id, './Downloads')
-            MLPipeLineService().register_computation_task_async(link, video_id, **kwargs)
-
+            info = {'id': video_id, 'link': link}
+            print(link, video_id)
+            threading.Thread(target=run, args=(link, video_id)).start()
             context = {"details": info}
 
         except ResourceUnavailableException:
