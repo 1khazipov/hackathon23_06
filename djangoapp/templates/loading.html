@@ -37,7 +37,7 @@
         function checkStatus(){
             setInterval( () =>
 
-            fetch('http://localhost:8000/get-operation-status/'+ videoId)
+            fetch('http://127.0.0.1:8000/get-operation-status/'+ videoId)
             .then(x => x.json())
             .then(x => x.status)
             .then(x => {

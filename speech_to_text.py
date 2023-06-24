@@ -1,4 +1,7 @@
+import math
+
 import torch
+import numpy as np
 from deep_translator import GoogleTranslator
 
 def text_with_punctuation(text):

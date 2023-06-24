@@ -10,7 +10,7 @@ def after_computed():
 def compute():
     pass
 
-@shared_task
+#@shared_task
 def ml_pipeline(url, id, **kwargs):
     key = f'{id}_status'
     try:

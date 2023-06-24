@@ -9,6 +9,8 @@ from .tasks import ml_pipeline
 
 class MLPipeLineService:
 
+    def compute(self, directory):
+        pass
 
     def register_computation_task_async(self, url, id, **kwargs):
         #computed = cache.get(id)
@@ -18,7 +20,7 @@ class MLPipeLineService:
 
 
         cache.set(key, {'status': 'pending'})
-        ml_pipeline.delay(url, id, **kwargs)
+        ml_pipeline(url, id, **kwargs)
 
 
 async def download_youtube_video_async(url,id, destination):
