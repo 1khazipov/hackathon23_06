@@ -57,7 +57,7 @@
                         <h2>{{ subtitle }}</h2>
                         <h3>{{ timecode }}</h3>
                         <p>{{ text }}</p>
-                        <img class="screenshot" alt="" src="path/{{ path }}"/>
+                        <img class="screenshot" alt=""  src="{% static 'frames/' %}{{ path }}"/>
                     </div>
                   {% endfor %}
                 </div>
