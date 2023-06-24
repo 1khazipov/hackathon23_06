@@ -1,5 +1,29 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from .utils import *
+
+def tryParseFloat(value):
+    try:
+        value = float(value)
+        return value
+    except ValueError:
+        return None
+
+def get_model_params(get):
+    kwargs = {}
+    start = None
+    if get.get("start"):
+        res = tryParseFloat(get.get("start"))
+        if res and res >= 0:
+           kwargs['start'] = res
+           start = res
+
+    if get.get("stop"):
+        res = tryParseFloat(get.get("stop"))
+        if res and res >= 0:
+            if start != None and start < res:
+                kwargs['stop'] = res
+
+    return kwargs
 
 async def download_side_effect(request):
     if request.method == 'GET' and request.GET.get("link"):
@@ -7,17 +31,18 @@ async def download_side_effect(request):
         video_id = extract_video_id(link)
 
         if not video_id:
-            return render(request, 'index.html', {'error': 'Не валидная ссылка'})
+            return render(request, 'index.html', {'error': 'Не ты ссылка'})
         try:
-            #todo: контент рут вынести в settings
+            kwargs = get_model_params(request.GET)
+            #todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             info = await download_youtube_video_async(link, video_id, './Downloads')
-            cached = await MLPipeLineService().register_computation_task_async(link)
+            cached = await MLPipeLineService().register_computation_task_async(link, video_id, **kwargs)
             if cached:
-                return redirect("fdg")
-            context = {"details": info}
+                return HttpResponseRedirect(f'/result/{video_id}')
+            context = {"details": info }
 
-        except:  #ResourceUnavailableException:
-            context = {"error": "video is unavailable"}
+        except ResourceUnavailableException:
+            context = {"error": "Видео не доступно."}
 
         return render(request, 'index.html', context)
     else:
