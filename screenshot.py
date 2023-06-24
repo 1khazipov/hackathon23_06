@@ -12,7 +12,7 @@ class ScreenshotSaver:
         self.video_path = video_path
         self.output_path = output_path
         self.screenshots_path = screenshots_path
-        self.screenshots_paths = []
+        self.screenshots_paths = [" "]
         self.screenshots_time = []
         self.interval = interval
 
@@ -102,9 +102,27 @@ class ScreenshotSaver:
         for screenshot_time in self.screenshots_time:
             index = lowestGreaterThan(sentences_time, screenshot_time)
             indexes.append(index)
+
+        start_paragraph = []
+        end_paragraph = []
+        end = 0
+        for i in range(len(sentences)):
+            if sentences[i].get('start') < sentences[indexes[0]].get('start'):
+                str1 += sentences[i].get('text')
+                end  = sentences[i].get('end')
+            else:
+                if i > 0:
+                    start = sentences[0].get('start')
+                    paragraphs.append(str1)
+                    start_paragraph.append(start)
+                    end_paragraph.append(end)
+                    break
+        str1 = ""
+
+        
         k = indexes[0]
-        start_paragraph = indexes.copy()
-        end_paragraph = indexes[1:].copy()
+        start_paragraph.extend(indexes.copy())
+        end_paragraph.extend(indexes[1:].copy())
         end_paragraph.append(sentences[-1].get('end'))
 
         for index in indexes[1:]:
@@ -127,7 +145,8 @@ class ScreenshotSaver:
         self.calculate_similarity()
         self.save_screenshots()
         paragraphs, start_paragraph, end_paragraph = self.text_plus_screenshot(
-            sentences=sentences)
+            sentences=sentences
+        )
 
         output_dict = {
             'text': "",
