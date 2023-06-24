@@ -2,7 +2,8 @@ import datetime
 
 from .timecodes import get_timestamped, get_sentences
 from .screenshot import ScreenshotSaver
-import os
+import os, shutil
+from .summarizer import create_title
 
 def ml_entry(source, id,):
     word_list = get_timestamped(source)
@@ -15,9 +16,14 @@ def ml_entry(source, id,):
                     output_path= temp,
                     screenshots_path=frames)
 
-    out = saver.run_algorithm(sentences=sentences)
-    os.remove(temp)
+    out_dict = saver.run_algorithm(sentences=sentences)
 
-    return out, frames
+    titles = [create_title(x.get('text')) for x in out_dict]
+    shutil.rmtree(temp)
+
+    import json
+    with open("C:\hackaton\hackathon23_06\djangoapp\my.json", "w", encoding="utf-8") as file:
+        json.dump(out_dict, file)
+    return out_dict, frames
 
 

@@ -1,9 +1,7 @@
-import sys
-import argparse
 import os
+import shutil
 import cv2
 import numpy as np
-from pathlib import Path
 from natsort import natsorted
 import math
 
@@ -12,12 +10,11 @@ class ScreenshotSaver:
     def __init__(self, video_path, output_path, screenshots_path, interval=1000):
         self.image_paths = []
         self.video_path = video_path
-        self.output_path =  output_path
+        self.output_path = output_path
         self.screenshots_path = screenshots_path
-        self.screenshots_paths = []
+        self.screenshots_paths = [" "]
         self.screenshots_time = []
         self.interval = interval
-
 
     def get_frames(self):
         count = 0
@@ -26,34 +23,38 @@ class ScreenshotSaver:
 
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
+        else:
+            shutil.rmtree(self.output_path)
+            os.makedirs(self.output_path)
+
         success = True
         while success:
-            vidcap.set(cv2.CAP_PROP_POS_MSEC,(count * self.interval))    # added this line 
+            vidcap.set(cv2.CAP_PROP_POS_MSEC, (count * self.interval))
             success, image = vidcap.read()
             try:
-                cv2.imwrite(self.output_path + "/frame%d.jpg" % count, image)     # save frame as JPEG file
-                self.image_paths.append(self.output_path + "/frame%d.jpg" % count)
+                cv2.imwrite(self.output_path + "/frame%d.jpg" % count, image)
+                self.image_paths.append(
+                    self.output_path + "/frame%d.jpg" % count)
             except Exception:
                 print("MB this is the end of the file")
             count += 1
 
-
     def error(self, h, w, img1, img2):
         diff = cv2.subtract(img1, img2)
-        err = np.sum(diff**2)
-        mse = err/(float(h*w))
+        err = np.sum(diff ** 2)
+        mse = err / (float(h * w))
+
         return mse
-    
 
     def calculate_similarity(self):
         images = os.listdir(self.output_path)
         images = natsorted(images)
         error_list = []
         for i in range(len(images) - 1):
-            img1 = cv2.imread(self.output_path  + '/' + images[i])
+            img1 = cv2.imread(self.output_path + '/' + images[i])
             img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
 
-            img2 = cv2.imread(self.output_path + '/' + images[i+1])
+            img2 = cv2.imread(self.output_path + '/' + images[i + 1])
             img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
             h, w = img1.shape
 
@@ -62,30 +63,34 @@ class ScreenshotSaver:
         self.error_list = error_list.copy()
         return error_list
 
-
-    def save_screenshots(self, error_threshold=0.5, sequence_threshold=20):
+    def save_screenshots(self, error_threshold=0.8, sequence_threshold=20):
         count = 0
         sequence = 0
+
         if not os.path.exists(self.screenshots_path):
             os.makedirs(self.screenshots_path)
+        else:
+            shutil.rmtree(self.screenshots_path)
+            os.makedirs(self.screenshots_path)
+
         for error in self.error_list:
             if error < error_threshold:
-                
                 sequence += 1
             if sequence > sequence_threshold:
                 try:
                     sequence = 0
                     img = cv2.imread(self.image_paths[count])
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                    cv2.imwrite(self.screenshots_path + "/frame%d.jpg" % count, img)
+                    cv2.imwrite(self.screenshots_path +
+                                "/frame%d.jpg" % count, img)
                     self.screenshots_time.append(count - sequence_threshold)
-                    self.screenshots_paths.append(self.screenshots_path + "/frame%d.jpg" % count)
+                    self.screenshots_paths.append(
+                        self.screenshots_path + "/frame%d.jpg" % count)
                 except Exception:
                     print("WTF EXCEPTION", count)
                     pass
             count += 1
         return self.screenshots_time, self.screenshots_paths
-
 
     def text_plus_screenshot(self, sentences):
         sentences_time = [x.get('start') for x in sentences]
@@ -96,9 +101,26 @@ class ScreenshotSaver:
         for screenshot_time in self.screenshots_time:
             index = lowestGreaterThan(sentences_time, screenshot_time)
             indexes.append(index)
+
+        start_paragraph = []
+        end_paragraph = []
+        end = 0
+        for i in range(len(sentences)):
+            if sentences[i].get('start') < sentences[indexes[0]].get('start'):
+                str1 += sentences[i].get('text')
+                end = sentences[i].get('end')
+            else:
+                if i > 0:
+                    start = sentences[0].get('start')
+                    paragraphs.append(str1)
+                    start_paragraph.append(start)
+                    end_paragraph.append(end)
+                    break
+        str1 = ""
+
         k = indexes[0]
-        start_paragraph = indexes.copy()
-        end_paragraph = indexes[1:].copy()
+        start_paragraph.extend(indexes.copy())
+        end_paragraph.extend(indexes[1:].copy())
         end_paragraph.append(sentences[-1].get('end'))
 
         for index in indexes[1:]:
@@ -115,13 +137,14 @@ class ScreenshotSaver:
         paragraphs.append(str1)
 
         return paragraphs, start_paragraph, end_paragraph
-    
-    
+
     def run_algorithm(self, sentences):
         self.get_frames()
         self.calculate_similarity()
         self.save_screenshots()
-        paragraphs, start_paragraph, end_paragraph = self.text_plus_screenshot(sentences=sentences)
+        paragraphs, start_paragraph, end_paragraph = self.text_plus_screenshot(
+            sentences=sentences
+        )
 
         output_dict = {
             'text': "",
@@ -131,7 +154,7 @@ class ScreenshotSaver:
         }
 
         output_list = []
-        for i in range(len(paragraphs)):   
+        for i in range(len(paragraphs)):
             output_dict = {
                 'text': paragraphs[i],
                 'start': start_paragraph[i],
@@ -143,21 +166,20 @@ class ScreenshotSaver:
         return output_list
 
 
-
 def lowestGreaterThan(arr, threshold):
-        low = 0
-        high = len(arr)
+    low = 0
+    high = len(arr)
 
-        while low < high:
-            mid = math.floor((low + high) / 2)
+    while low < high:
+        mid = math.floor((low + high) / 2)
 
-            if arr[mid] == threshold:
-                return mid
-            elif arr[mid] < threshold and mid != low:
-                low = mid
-            elif arr[mid] > threshold and mid != high:
-                high = mid
-            else:
-                high = low = low + 1
+        if arr[mid] == threshold:
+            return mid
+        elif arr[mid] < threshold and mid != low:
+            low = mid
+        elif arr[mid] > threshold and mid != high:
+            high = mid
+        else:
+            high = low = low + 1
 
-        return low
+    return low
