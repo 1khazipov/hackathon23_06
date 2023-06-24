@@ -8,7 +8,9 @@ def get_timestamped(file_path, language='ru'):
 
     result = whisper.transcribe(model, audio, language=language)
 
+    word_list = []
     for segment in result.get('segments'):
         for word in segment.get('words'):
-            yield word
-
+            word_list.append(word)
+    
+    return word_list
