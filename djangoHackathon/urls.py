@@ -19,6 +19,5 @@ from django.urls import path
 from myapp import views
 
 urlpatterns = [
-    path('get/', views.get_data, name='get_data'),
-    path('get/<slug:id>/', views.download_side_effect)
+    path('get/', views.download_side_effect, name="get_data")
 ]
