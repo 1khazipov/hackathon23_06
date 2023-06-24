@@ -8,14 +8,14 @@ from .Exceptions.exceptions import ResourceUnavailableException
 from .tasks import ml_pipeline
 
 def run(url, id):
-    download_youtube_video(url, id, './Downloads')
+    source = download_youtube_video(url, id, './Downloads')
     key = f'{id}_status'
     registered = cache.get(key)
     if registered and registered['status'] == 'pending':
         return
 
     cache.set(key, {'status': 'pending'})
-    ml_pipeline(url, id)
+    ml_pipeline(source, id)
 
 
 def download_youtube_video(url, video_id, destination):
@@ -30,6 +30,7 @@ def download_youtube_video(url, video_id, destination):
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+    return destination
 
 def extract_video_id(url):
     if url is not None:
