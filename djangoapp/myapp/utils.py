@@ -2,11 +2,15 @@ import yt_dlp
 import pytube
 import asyncio
 import os.path
+import re
 from .Exceptions.exceptions import ResourceUnavailableException
 from .tasks import ml_pipeline
 
 class MLPipeLineService:
-    async def register_computation_task_async(self, url) -> bool:
+    async def register_computation_task_async(self, url, id) -> bool:
+        #computed = cache.get(id)
+        #if computed:
+
         #todo: начинать бэкграунд обработку или говорить, что в кжше уже есть данные.
         ml_pipeline.delay()
         return False
@@ -27,7 +31,6 @@ async def download_youtube_video_async(url, destination):
     title = details['title']
     destination = os.path.join(destination, id)
     if not os.path.exists(destination):
-        print("зашел сюда")
         #todo: среднее качесвто 720 или 1080 на выбор
         video = youtube.streams.filter(progressive=True, file_extension='mp4', resolution='720p')\
                            .order_by('resolution').first()
@@ -45,7 +48,7 @@ async def download_youtube_video_async(url, destination):
         'directory': destination+id
     }
 
-async def download_youtube_video_async(url, destination):
+async def download_youtube_video_async(url, video_id, destination):
     loop = asyncio.get_event_loop()
 
     # todo: convert to lambda
@@ -54,7 +57,7 @@ async def download_youtube_video_async(url, destination):
 
     #youtube = await loop.run_in_executor(None, do_async)
     #details = youtube.vid_info['videoDetails']
-    details = {'videoId':'GYB2qBwNKnc', 'title': "ffff"}
+    details = {'videoId':video_id, 'title': "ffff"}
     #if details['isLiveContent'] or details['isPrivate']:
     #    raise ResourceUnavailableException()
     #pytube.cipher.get_throttling_function_name =
@@ -86,3 +89,13 @@ async def download_youtube_video_async(url, destination):
         'link': url,
         'directory': destination + id
     }
+
+def extract_video_id(url):
+    if url is not None:
+        regex = r"(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|https?:\/\/(?:www\.)?youtu\.be\/)([a-zA-Z0-9_-]{11})"
+        match = re.search(regex, url)
+        if match:
+            video_id = match.group(1)
+            return video_id
+
+    return None

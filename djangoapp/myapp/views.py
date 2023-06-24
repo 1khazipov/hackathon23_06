@@ -1,35 +1,22 @@
 from django.shortcuts import render, redirect
-import re, os
 from .utils import *
-
-def extract_video_id(url):
-    regex = r"(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|https?:\/\/(?:www\.)?youtu\.be\/)([a-zA-Z0-9_-]{11})"
-
-    match = re.search(regex, url)
-
-    if match:
-        video_id = match.group(1)
-        return video_id
-    else:
-        return None
-
-def is_valid(url):
-    return True
 
 async def download_side_effect(request):
     if request.method == 'GET' and request.GET.get("link"):
         link = request.GET.get("link")
-        if not is_valid(link):
+        video_id = extract_video_id(link)
+
+        if not video_id:
             return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
-            link = "https://www.youtube.com/watch?v=GYB2qBwNKnc"
-            info = await download_youtube_video_async(link, './Downloads')
+            #todo: контент рут вынести в settings
+            info = await download_youtube_video_async(link, video_id, './Downloads')
             cached = await MLPipeLineService().register_computation_task_async(link)
             if cached:
                 return redirect("fdg")
             context = {"details": info}
 
-        except ResourceUnavailableException:
+        except:  #ResourceUnavailableException:
             context = {"error": "video is unavailable"}
 
         return render(request, 'index.html', context)
@@ -50,18 +37,16 @@ def string_to_array(string):
     return array
 
 
-subtitle = 'a1\na2\na3\na4'
+subtitle = 'Text\nText\nText\nText'
 timecodes = '[00:00-01:01]\n[01:01-02:21]\n[02:21-03:01]\n[03:01-03:11]'
-texts = 't1\nt2\nt3\nt4'
+texts = 'Идейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.'
 paths = 'p1\np2\np3\np4'
 frames = os.listdir("static/frames")
 
 
 def get_data(request):
     if request.method == 'GET':
-        return render(request, 'index.html')
-    elif request.method == 'POST':
-        text = request.POST.get('link')
+        text = "https://www.youtube.com/watch?v=GYB2qBwNKnc"#request.GET.get('link')
         video_id = extract_video_id(text)
         zipped_data = zip(
             string_to_array(subtitle),

@@ -21,4 +21,5 @@ from myapp import views
 urlpatterns = [
     path('get/', views.download_side_effect, name="get_data"),
     path('get-operation-status/<slug:id>', views.get_operation_status),
+    path('expected-result/', views.get_data),
 ]
