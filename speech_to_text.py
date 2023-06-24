@@ -1,5 +1,4 @@
 import torch
-import speech_recognition as sr
 from deep_translator import GoogleTranslator
 
 def text_with_punctuation(text):
@@ -60,10 +59,6 @@ def make_paragraphs(text):
 
     return text
 
-def speech_to_text(audio) -> str:
-    r = sr.Recognizer()
-    with sr.AudioFile(audio) as source:
-        audio_data = r.record(source)
-        text = r.recognize_google(audio_data)
+def make_formal_text(text: str) -> str:
     text = text_with_punctuation(text)
     return make_paragraphs(text)
