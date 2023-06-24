@@ -35,9 +35,10 @@ def get_model_params(get):
     return kwargs2
 
 async def download_side_effect(request):
-    if request.method == 'GET' and request.GET.get("link"):
-        link = request.GET.get("link")
-        video_id = extract_video_id(link)
+    if request.method == 'POST' and request.GET.get("link") and request.GET.get("x")\
+            and request.GET.get("y") and request.GET.get("x"):
+        link = request.GET.get("link") #link
+        video_id = extract_video_id(link) #id
 
         if not video_id:
             return render(request, 'index.html', {'error': 'Не ты ссылка'})
@@ -53,9 +54,10 @@ async def download_side_effect(request):
         except ResourceUnavailableException:
             context = {"error": "Видео не доступно."}
 
-        return render(request, 'index.html', context)
+        return render(request, 'loading.html', context)
     else:
-        return render(request, 'index.html')
+        context = {"error": "Видео не доступно."}
+        return render(request, 'index.html', {'error': "Видео не доступно."})
 
 async def get_operation_status(request, id):
     key = f'{id}_status'
