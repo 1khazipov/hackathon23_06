@@ -16,10 +16,14 @@
                     <!-- search bar -->
                     <div class="searchbar-container">
                         <div class="searchbar-elems">
-                            <form class="form" method="get" action="{% url 'get_data' %}">
-                            <input style="width: 70%" name="link" type="text" placeholder="youtube video link here" class="searchbar-field"
-                            {% if details %} value="{{details.link}}" {% endif %}/>
-                            <button type="submit" class="button">Поиск</button>
+                            <form class="form" method="POST" action="{% url 'get_data' %}">
+                                {% csrf_token %}
+                                <input style="width: 70%" name="link" type="text" placeholder="youtube video link here" class="searchbar-field"
+                                {% if details %} value="{{details.link}}" {% endif %}/>
+                                <input style="width: 70%" name="x" type="text" placeholder="чч:мм:сс x" class="searchbar-field-2"/>
+                                <input style="width: 70%" name="y" type="text" placeholder="чч:мм:сс y" class="searchbar-field-2"/>
+                                <input style="width: 70%" name="z" type="number" placeholder="кол-во символов z" class="searchbar-field-2"/>
+                                <button type="submit" class="button">Поиск</button>
                             </form>
                             <br>
                         </div>
@@ -29,7 +33,6 @@
                     <hr>
                     <div figure="rectangle"></div>
                 </div>
-                <hi>{{ error }}</hi>
                 <div class="card-content-container">
                     <div class="source-link" {% if error %} style="background-color:red" {% endif %}>
                         <!-- source link -->
