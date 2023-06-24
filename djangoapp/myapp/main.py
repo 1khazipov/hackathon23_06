@@ -21,9 +21,12 @@ def ml_entry(source, id,):
     titles = [create_title(x.get('text')) for x in out_dict]
     shutil.rmtree(temp)
 
-    import json
-    with open("C:\hackaton\hackathon23_06\djangoapp\my.json", "w", encoding="utf-8") as file:
-        json.dump(out_dict, file)
-    return out_dict, frames
+    #import json
+    #with open("C:\hackaton\hackathon23_06\djangoapp\my.json", "w", encoding="utf-8") as file:
+    #    json.dump(out_dict, file)
+    #with open("C:\hackaton\hackathon23_06\djangoapp\mtitlea.json", "w", encoding="utf-8") as file:
+    #    json.dump(titles, file)
+    print("finished")
+    return out_dict, titles, frames, temp
 
 

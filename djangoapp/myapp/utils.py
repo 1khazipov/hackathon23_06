@@ -7,19 +7,20 @@ import re
 from .Exceptions.exceptions import ResourceUnavailableException
 from .tasks import ml_pipeline
 
-def run(url, id):
-    source = download_youtube_video(url, id, './Downloads')
+def run(url, id, options):
     key = f'{id}_status'
     registered = cache.get(key)
     if registered and registered['status'] == 'pending':
         return
 
     cache.set(key, {'status': 'pending'})
-    ml_pipeline(source, id)
-
+    try:
+        source = download_youtube_video(url, id, './Downloads')
+        ml_pipeline(source, id, options)
+    except:
+        cache.set(key, {'status': "failed"})
 
 def download_youtube_video(url, video_id, destination):
-    print(destination)
     destination = os.path.join(destination, f'{video_id}.mp4')
 
     if not os.path.exists(destination):

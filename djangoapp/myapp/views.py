@@ -2,32 +2,27 @@ from django.shortcuts import render, redirect, HttpResponseRedirect, HttpRespons
 from django.core.cache import cache
 from django.http import JsonResponse
 from .utils import *
-import json
+import re
 import threading
 
-
-def tryParseFloat(value):
-    try:
-        value = float(value)
-        return value
-    except ValueError:
-        return None
+def get_seconds(string):
+    ints = list(map(int, string.split(':')))
+    return ints[0]*24*60+ints[1]*60+ ints[2]
 
 
-def get_model_params(get):
+def get_args(params):
     kwargs = {}
-    start = None
-    if get.get("start"):
-        res = tryParseFloat(get.get("start"))
-        if res and res >= 0:
-            kwargs['start'] = res
-            start = res
-
-    if get.get("stop"):
-        res = tryParseFloat(get.get("stop"))
-        if res and res >= 0:
-            if start != None and start < res:
-                kwargs['stop'] = res
+    reg = re.compile(r'\d{1,2}:\d{2}:\d{2}')
+    if params.get("start") and reg.match(params.get("start")):
+        kwargs["start"] = get_seconds(params.get("start"))
+    if params.get("stop") and reg.match(params.get("stop")):
+        stop = get_seconds(params.get("stop"))
+        if not kwargs.get("start") or kwargs["start"] < stop:
+            kwargs['stop'] = stop
+    if params.get("max") and isinstance(params.get("max"), int):
+        max = int(params.get("max"))
+        if max > 0:
+            kwargs['max'] = max
 
     return kwargs
 
@@ -48,7 +43,8 @@ async def download_side_effect(request):
             # todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             info = {'id': video_id, 'link': link}
             print(link, video_id)
-            threading.Thread(target=run, args=(link, video_id)).start()
+            run(link, video_id, kwargs)
+            #threading.Thread(target=run, args=()).start()
             context = {"details": info}
 
         except ResourceUnavailableException:
