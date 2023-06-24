@@ -1,6 +1,18 @@
 from django.shortcuts import render
 import re, os
 from .utils import *
+import yt_dlp
+
+
+async def download_youtube_video(url):
+    ydl_opts = {
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'outtmpl': 'video.mp4',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
 
 def extract_video_id(url):
     regex = r"(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|https?:\/\/(?:www\.)?youtu\.be\/)([a-zA-Z0-9_-]{11})"
@@ -12,12 +24,16 @@ def extract_video_id(url):
         return video_id
     else:
         return None
+
+
 def is_valid(url):
     return True
+
 
 async def download_side_effect(request):
     if request.method == 'GET' and request.GET.get("link"):
         link = request.GET.get("link")
+        print(link)
         if not is_valid(link):
             return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
@@ -43,11 +59,12 @@ paths = 'p1\np2\np3\np4'
 frames = os.listdir("static/frames")
 
 
-def get_data(request):
+async def get_data(request):
     if request.method == 'GET':
         return render(request, 'index.html')
     elif request.method == 'POST':
         text = request.POST.get('link')
+        await download_youtube_video(text)
         video_id = extract_video_id(text)
         zipped_data = zip(
             string_to_array(subtitle),

@@ -17,7 +17,11 @@ Including another URLconf
 
 from django.urls import path
 from myapp import views
-
+#
+# urlpatterns = [
+#     path('get/', views.download_side_effect, name="get_data")
+# ]
 urlpatterns = [
-    path('get/', views.download_side_effect, name="get_data")
+    path('get/', views.get_data, name='get_data'),
+    path('get/<slug:id>/', views.download_side_effect)
 ]
