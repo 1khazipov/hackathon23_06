@@ -1,32 +1,38 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect, HttpResponse
-from django.core.cache import cache
+from django.shortcuts import render
 from django.http import JsonResponse
 from .utils import *
-import json
 
 def tryParseFloat(value):
     try:
-        value = float(value)
+        value = float(str(value))
+        return value
+    except ValueError:
+        return None
+
+def tryParseInt(value):
+    try:
+        value = int(str(value))
         return value
     except ValueError:
         return None
 
 def get_model_params(get):
-    kwargs = {}
-    start = None
-    if get.get("start"):
-        res = tryParseFloat(get.get("start"))
-        if res and res >= 0:
-           kwargs['start'] = res
-           start = res
+    kwargs = {
+        'start':tryParseFloat(get.get('start')),
+        'stop': tryParseFloat(get.get('stop')),
+        'max-symbols': tryParseInt(get.get('max-symbols'))
+    }
 
-    if get.get("stop"):
-        res = tryParseFloat(get.get("stop"))
-        if res and res >= 0:
-            if start != None and start < res:
-                kwargs['stop'] = res
+    kwargs2 = {}
+    if kwargs.get('start') and kwargs.get('start') >=0:
+        kwargs2['start'] = kwargs.get('start')
+    if kwargs.get('stop') and kwargs['stop'] >=0:
+        if kwargs2.get('start') != None and kwargs.get('stop') >= kwargs.get('start') or kwargs.get('start') == None:
+            kwargs2['stop'] = kwargs['stop']
+    if kwargs.get('max-symbols') and kwargs.get('max-symbols') >=0:
+        kwargs2['max-symbols'] = kwargs['max-symbols']
 
-    return kwargs
+    return kwargs2
 
 async def download_side_effect(request):
     if request.method == 'POST' and request.GET.get("link") and request.GET.get("x")\
@@ -37,7 +43,8 @@ async def download_side_effect(request):
         if not video_id:
             return render(request, 'index.html', {'error': 'Не ты ссылка'})
         try:
-            kwargs = {}#get_model_params(request.GET)
+            kwargs = get_model_params(request.GET)
+            print(kwargs.get('max-symbols'))
             #todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             info = await download_youtube_video_async(link, video_id, './Downloads')
             MLPipeLineService().register_computation_task_async(link, video_id, **kwargs)
