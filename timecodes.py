@@ -43,5 +43,5 @@ def get_sentences(word_list):
             if new_sentence:
                 start = word.get('start')
                 new_sentence = False
-            
+
     return sentences
