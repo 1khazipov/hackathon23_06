@@ -22,6 +22,7 @@ async def download_side_effect(request):
         if not is_valid(link):
             return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
+            link = "https://www.youtube.com/watch?v=GYB2qBwNKnc"
             info = await download_youtube_video_async(link, './Downloads')
             cached = await MLPipeLineService().register_computation_task_async(link)
             if cached:

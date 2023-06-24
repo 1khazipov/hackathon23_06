@@ -52,27 +52,27 @@ async def download_youtube_video_async(url, destination):
     def do_async():
         return pytube.YouTube(url)
 
-    youtube = await loop.run_in_executor(None, do_async)
-    details = youtube.vid_info['videoDetails']
-    if details['isLiveContent'] or details['isPrivate']:
-        raise ResourceUnavailableException()
+    #youtube = await loop.run_in_executor(None, do_async)
+    #details = youtube.vid_info['videoDetails']
+    details = {'videoId':'GYB2qBwNKnc', 'title': "ffff"}
+    #if details['isLiveContent'] or details['isPrivate']:
+    #    raise ResourceUnavailableException()
     #pytube.cipher.get_throttling_function_name =
     id = details['videoId']  # or video.download().video_id
     title = details['title']
-    destination = os.path.join(destination, id)
+    destination = os.path.join(destination, f'{id}.mp4')
     if not os.path.exists(destination):
-        print("зашел сюда")
         # todo: среднее качесвто 720 или 1080 на выбор
-        video = youtube.streams.filter(progressive=True, file_extension='mp4', resolution='720p') \
-            .order_by('resolution').first()
-        if not video:
-            raise ResourceUnavailableException()
+        #video = youtube.streams.filter(progressive=True, file_extension='mp4', resolution='720p') \
+        #    .order_by('resolution').first()
+        #if not video:
+        #    raise ResourceUnavailableException()
 
         def download_async():
             ydl_opts = {
                 # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                 'format': 'best[ext=mp4]',
-                'outtmpl': os.path.join(f'{id}.mp4'),
+                'outtmpl': os.path.join(destination),
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
