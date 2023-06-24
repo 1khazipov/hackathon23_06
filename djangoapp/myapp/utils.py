@@ -2,18 +2,21 @@ import yt_dlp
 import pytube
 import asyncio
 import os.path
+from django.core.cache import cache
 import re
 from .Exceptions.exceptions import ResourceUnavailableException
 from .tasks import ml_pipeline
 
 class MLPipeLineService:
-    async def register_computation_task_async(self, url, id) -> bool:
+    def register_computation_task_async(self, url, id, **kwargs):
         #computed = cache.get(id)
         #if computed:
+        key = f'{id}_status'
+        registered = cache.get(key)
 
-        #todo: начинать бэкграунд обработку или говорить, что в кжше уже есть данные.
-        ml_pipeline.delay()
-        return False
+
+        cache.set(key, {'status': 'pending'})
+        ml_pipeline.delay(url, id, **kwargs)
 
 
 async def download_youtube_video_async(url,id, destination):

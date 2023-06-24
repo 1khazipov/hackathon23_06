@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.shortcuts import render, redirect, HttpResponseRedirect, HttpResponse
+from django.core.cache import cache
+from django.http import JsonResponse
 from .utils import *
+import json
 
 def tryParseFloat(value):
     try:
@@ -33,12 +36,11 @@ async def download_side_effect(request):
         if not video_id:
             return render(request, 'index.html', {'error': 'Не ты ссылка'})
         try:
-            kwargs = get_model_params(request.GET)
+            kwargs = {}#get_model_params(request.GET)
             #todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             info = await download_youtube_video_async(link, video_id, './Downloads')
-            cached = await MLPipeLineService().register_computation_task_async(link, video_id, **kwargs)
-            if cached:
-                return HttpResponseRedirect(f'/result/{video_id}')
+            MLPipeLineService().register_computation_task_async(link, video_id, **kwargs)
+
             context = {"details": info }
 
         except ResourceUnavailableException:
@@ -49,6 +51,11 @@ async def download_side_effect(request):
         return render(request, 'index.html')
 
 async def get_operation_status(request, id):
+    key = f'{id}_status'
+    cached = cache.get(key)
+    if cached:
+        return JsonResponse({"status": cached['status']})
+    return JsonResponse({'status': 'unregistered'})
     '''
     todo: смотреть статус операции и возвращать
     {status: "pending", come_again: 30sec}
