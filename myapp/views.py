@@ -22,11 +22,12 @@ async def download_side_effect(request):
         if not is_valid(link):
             return render(request, 'index.html', {'error': 'Не валидная ссылка'})
         try:
-            info = await download_yotube_video_async(link, './Downloads')
-            cached = await MLPipeLineService().register_computation_task_async()
+            #info = await download_yotube_video_async(link, './Downloads')
+            cached = await MLPipeLineService().register_computation_task_async(link)
             if cached:
                 return redirect("fdg")
-            context = {"details": info}
+            #context = {"details": info}
+            context = {"details": {"id":"dfdfd", "title":"fdgdfgd"}}
         except ResourceUnavailableException:
             context = {"error": "video is unavailable"}
 

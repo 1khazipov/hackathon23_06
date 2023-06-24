@@ -4,11 +4,12 @@ import pytube
 import asyncio
 import os.path
 from .Exceptions.exceptions import ResourceUnavailableException
+from .tasks import ml_pipeline
 
 class MLPipeLineService:
-     async def register_computation_task_async(self) -> bool:
+    async def register_computation_task_async(self, url) -> bool:
         #todo: начинать бэкграунд обработку или говорить, что в кжше уже есть данные.
-        time.sleep(30)
+        ml_pipeline.delay()
         return True
 
 
