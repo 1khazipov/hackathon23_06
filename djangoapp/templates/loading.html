@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jango Python Loading Page</title>
+    <title>Обработка статьи</title>
     <style>
         @keyframes blink {
             0% { opacity: 0; }
@@ -20,7 +20,7 @@
 </head>
 <body>
     <div>
-        <div class="loading-text">Loading... <div id="message"></div></div>
+        <div class="loading-text">Обработка... <div id="message"></div></div>
     </div>
 
         <div style="display: none" id="video_id">{{video_id}}</div>
@@ -44,15 +44,20 @@
                 var string;
                 if (x == 'ready') {
                     console.log(videoId)
-                    document.location.href='http://localhost:8000/content/'+videoId;
+                    document.location.href='http://127.0.0.1:8000/'+videoId;
                 } else if (x == 'pending') {
-                    console.log('pending')
-                } else {
+
+                }
+                else if (x == 'failed') {
+                    alert("Упс... Произошла ошибка на сервере")
+                    document.location.href='http://127.0.0.1:8000/';
+                }
+                else {
                     document.getElementById('message').innerText = x;
                 }
             })
-            .catch(err => document.getElementById('message').innerText = 'error'),
-            5000)
+            .catch(err => document.location.href='http://127.0.0.1:8000/'),
+            20000)
         }
 
         window.onload = () => {

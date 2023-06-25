@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render,Http404, redirect, HttpResponseRedirect, HttpResponse
 from django.core.cache import cache
 from django.http import JsonResponse
 from .utils import *
@@ -7,7 +7,7 @@ import threading
 
 def get_seconds(string):
     ints = list(map(int, string.split(':')))
-    return ints[0]*24*60+ints[1]*60+ ints[2]
+    return ints[0]*60*60+ints[1]*60+ ints[2]
 
 
 def get_args(params):
@@ -39,7 +39,8 @@ async def download_side_effect(request):
         if not video_id:
             return render(request, 'index.html', {'error': 'Не ты ссылка'})
         try:
-            kwargs = {}  # get_model_params(request.GET)
+            kwargs = get_args(request.POST)
+            print(kwargs)
             # todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             info = {'id': video_id, 'link': link}
             print(link, video_id)
@@ -52,8 +53,7 @@ async def download_side_effect(request):
 
         return render(request, 'loading.html', {'video_id': video_id})
     else:
-        context = {"error": "Видео не доступно."}
-        return render(request, 'index.html', {'error': "Видео не доступно."})
+        return render(request, 'index.html')
 
 
 async def get_operation_status(request, id):
@@ -75,22 +75,18 @@ def string_to_array(string):
     return array
 
 
-subtitle = 'Text\nText\nText\nText'
-timecodes = '[00:00-01:01]\n[01:01-02:21]\n[02:21-03:01]\n[03:01-03:11]'
-texts = 'Идейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.\nИдейные соображения высшего порядка, а также внедрение современных методик не даёт нам иного выбора, кроме определения модели развития. Предварительные выводы неутешительны: убеждённость некоторых оппонентов говорит о возможностях поэтапного и последовательного развития общества.'
-paths = 'p1\np2\np3\np4'
-frames = os.listdir("static/frames")
-
-
-def get_data(request):
+def get_data(request, id):
     if request.method == 'GET':
-        text = "https://www.youtube.com/watch?v=GYB2qBwNKnc"  # request.GET.get('link')
-        video_id = extract_video_id(text)
+        summary = cache.get(id)
+        print(summary)
+        if not summary:
+            return Http404()
+
         zipped_data = zip(
-            string_to_array(subtitle),
-            string_to_array(timecodes),
-            string_to_array(texts),
-            frames)
-        return render(request, 'index.html', {'id': video_id, 'zipped_data': zipped_data})
+            summary['titles'],
+            summary['timecodes'],
+            summary['texts'],
+            summary['frames'])
+        return render(request, 'index.html', {'id': id, 'zipped_data': zipped_data})
     else:
-        return render(request, 'index.html')
+        return redirect('get_data')

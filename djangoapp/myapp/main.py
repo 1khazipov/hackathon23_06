@@ -11,7 +11,7 @@ def ml_entry(source, id,):
     time = datetime.datetime.now()
     timestamp = f'{time.year}{time.month}{time.day}{time.second}'
     temp = os.path.join("temp",f'{id}_{timestamp}')
-    frames = os.path.join("frames", f'{id}')
+    frames = os.path.join("static","frames", f'{id}')
     saver = ScreenshotSaver(video_path=source,
                     output_path= temp,
                     screenshots_path=frames)

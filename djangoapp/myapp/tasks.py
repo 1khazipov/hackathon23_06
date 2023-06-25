@@ -23,10 +23,9 @@ def prepareToSave(out, titles, frames):
         end_seconds = int(item['end'])
         end_time = '{:02d}:{:02d}:{:02d}'.format(end_seconds // 3600, (end_seconds % 3600) // 60, end_seconds % 60)
 
-        times.append('[{}:{}]'.format(start_time, end_time))
+        times.append(f'[{start_time}-{end_time}]')
 
         frame_path = item['frame_path'].replace('\\', '/')
-        frame_path = '/static/' + frame_path
         frames.append(frame_path)
     frames.pop(0)
 
@@ -43,28 +42,25 @@ def save_computed(id, out, titles, frames):
 
     FILE_PATH = f'./folder/{id}.json'
     print(FILE_PATH)
-    cache.set(id, summary)
+    cache.set(id, summary, 60*60)
     print("cached")
     sum = cache.get(id)
     print(sum)
-    with open(FILE_PATH, 'w+') as outfile:
-        json.dump(summary, outfile)
+    #todo:
+    #with open(FILE_PATH, 'w+') as outfile:
+    #    json.dump(summary, outfile)
     cache.set(id, summary)
 
 
 #@shared_task
 def ml_pipeline(source, id, kwargs):
-    print('start')
     try:
         text, titles, frames, options = ml_entry(source, id)
         save_computed(id, text, titles, frames)
-        print("SAVEd")
         cache.set(f'{id}_status', {'status': 'ready'})
 
     except Exception as err:
-        print("Crached")
-        print(err)
-        print(err.with_traceback())
+        print("ошибка в пайпе")
         if options:
             shutil.rmtree(options["temp"])
         raise Exception
