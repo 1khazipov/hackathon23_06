@@ -20,7 +20,7 @@
                                 {% csrf_token %}
                                 <div class="lower-inputs">
                                 <input style="width: 195%" name="link" type="text" placeholder="вставьте ссылку на ролик" class="searchbar-field"
-                                {% if details %} value="{{details.link}}" {% endif %}/>
+                                {% if link %} value="{{link}}" {% endif %}/>
                                 <input style="width: 70%" name="start" type="text" placeholder="чч:мм:сс x" class="searchbar-field"/>
                                 <input style="width: 70%" name="stop" type="text" placeholder="чч:мм:сс y" class="searchbar-field"/>
                                 <input hidden style="width: 70%" name="max" type="number" placeholder="кол-во символов z" class="searchbar-field"/>
@@ -47,10 +47,10 @@
                         </h4>
                     </div>
                         <!-- loading symbol -->
-                    {% if details %}
+                    {% if id %}
                     <div>
                         <iframe class="iframe" width="100%" height="315"
-                        src="https://www.youtube.com/embed/{{ details.id }}">
+                        src="https://www.youtube.com/embed/{{id}}">
                         </iframe>
                     </div>
                     {% endif %}
