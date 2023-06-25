@@ -18,8 +18,8 @@ def ml_entry(source, id,):
 
     out_dict = saver.run_algorithm(sentences=sentences)
 
-    [create_title(x.get('text'), num_return_sequences=2) for x in out_dict]
-    shutil.rmtree(temp)
+    titles = [create_title(x.get('text'), num_return_sequences=2) for x in out_dict]
+    #shutil.rmtree(temp)
 
     #import json
     #with open("C:\hackaton\hackathon23_06\djangoapp\my.json", "w", encoding="utf-8") as file:

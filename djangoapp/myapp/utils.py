@@ -20,7 +20,7 @@ def run(url, id, options):
     if registered and registered['status'] == 'pending':
         return
 
-    cache.set(key, {'status': 'pending'})
+    cache.set(key, {'status': 'pending'}, 60*60)
     try:
         source = download_youtube_video(url, id, './Downloads')
         source = trim_if_requested(source, options)
