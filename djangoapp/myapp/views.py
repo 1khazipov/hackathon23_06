@@ -41,7 +41,6 @@ async def download_side_effect(request):
         try:
             kwargs = get_args(request.POST)
             print(kwargs)
-            # todo: контент рут вынести в settings, запускать скачивание внутри pipelineservice
             print(link, video_id)
             #run(link, video_id, kwargs)
             threading.Thread(target=run, args=(link, video_id, kwargs)).start()
