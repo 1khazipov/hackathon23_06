@@ -24,7 +24,6 @@ def run(url, id, options):
     try:
         source = download_youtube_video(url, id, './Downloads')
         trim_if_requested(source, options)
-        return
         ml_pipeline(source, id, options)
     except Exception as err:
         print(err)
