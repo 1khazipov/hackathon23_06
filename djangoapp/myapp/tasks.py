@@ -7,7 +7,11 @@ from .main import ml_entry
 
 from celery import shared_task
 
-def prepareToSave(out, titles, frames):
+def prepareToSave(out, titles, frames, options):
+    #todo: check if time delta is correct
+    time_delta = 0
+    if options.get("start"):
+        time_delta = options.get("start")
     print("parsing")
     texts = []
     times = []
@@ -16,11 +20,11 @@ def prepareToSave(out, titles, frames):
     for item in out:
         texts.append(item['text'])
 
-        start_seconds = int(item['start'])
+        start_seconds = int(item['start']) + time_delta
         start_time = '{:02d}:{:02d}:{:02d}'.format(start_seconds // 3600, (start_seconds % 3600) // 60,
                                                    start_seconds % 60)
 
-        end_seconds = int(item['end'])
+        end_seconds = int(item['end']) + time_delta
         end_time = '{:02d}:{:02d}:{:02d}'.format(end_seconds // 3600, (end_seconds % 3600) // 60, end_seconds % 60)
 
         times.append(f'[{start_time}-{end_time}]')
@@ -35,8 +39,8 @@ def prepareToSave(out, titles, frames):
         arr.append(decoded_pair)
     return arr, times, texts, frames
 
-def save_computed(id, out, titles, frames):
-    titles, times, texts, frames = prepareToSave(out, titles, frames)
+def save_computed(id, out, titles, frames, options):
+    titles, times, texts, frames = prepareToSave(out, titles, frames, options)
     print("calculated")
     summary = {"titles": titles, 'texts': texts, 'frames': frames, 'timecodes': times}
 
@@ -53,14 +57,14 @@ def save_computed(id, out, titles, frames):
 
 
 #@shared_task
-def ml_pipeline(source, id, kwargs):
+def ml_pipeline(source, id, options):
     try:
-        text, titles, frames, options = ml_entry(source, id)
-        save_computed(id, text, titles, frames)
+        text, titles, frames, temp = ml_entry(source, id)
+        save_computed(id, text, titles, frames, options)
         cache.set(f'{id}_status', {'status': 'ready'})
 
     except Exception as err:
         print("ошибка в пайпе")
-        if options:
-            shutil.rmtree(options["temp"])
+        if temp:
+            shutil.rmtree(temp)
         raise Exception

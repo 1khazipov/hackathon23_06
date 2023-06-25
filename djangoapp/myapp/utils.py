@@ -23,7 +23,7 @@ def run(url, id, options):
     cache.set(key, {'status': 'pending'})
     try:
         source = download_youtube_video(url, id, './Downloads')
-        trim_if_requested(source, options)
+        source = trim_if_requested(source, options)
         ml_pipeline(source, id, options)
     except Exception as err:
         print(err)
@@ -31,7 +31,7 @@ def run(url, id, options):
 
 def trim_if_requested(source, options):
     if not options.get('start') and not options.get('stop'):
-        return
+        return source
     duration = get_video_duration(source)
     print(duration)
     start, stop = 0, duration
@@ -46,6 +46,7 @@ def trim_if_requested(source, options):
     print(f'{source[:-4]}_{start}_{stop}.mp4')
     out = f'{source[:-4]}_{start}_{stop}.mp4'.replace('\\','/')
     trim_video(source, out, start, stop)
+    return out
 
 def get_video_duration(video_path):
     video = VideoFileClip(video_path)

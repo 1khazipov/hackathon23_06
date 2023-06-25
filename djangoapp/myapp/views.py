@@ -85,6 +85,6 @@ def get_data(request, id):
             summary['timecodes'],
             summary['texts'],
             summary['frames'])
-        return render(request, 'index.html', {'id': id, 'zipped_data': zipped_data})
+        return render(request, 'index.html', {'id': id, 'zipped_data': zipped_data, 'link':f'https://youtube.com?watch/?v={id}'})
     else:
         return redirect('get_data')
