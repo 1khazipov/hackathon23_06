@@ -7,7 +7,15 @@ import math
 
 
 class ScreenshotSaver:
-    def __init__(self, video_path, output_path, screenshots_path, interval=1000):
+    def __init__(
+            self,
+            video_path,
+            output_path,
+            screenshots_path,
+            interval=1000,
+            error_threshold=0.8,
+            sequence_threshold=20
+    ):
         self.image_paths = []
         self.video_path = video_path
         self.output_path = output_path
@@ -15,6 +23,8 @@ class ScreenshotSaver:
         self.screenshots_paths = [" "]
         self.screenshots_time = []
         self.interval = interval
+        self.error_threshold = error_threshold
+        self.sequence_threshold = sequence_threshold
 
     def get_frames(self):
         count = 0
@@ -36,7 +46,7 @@ class ScreenshotSaver:
                 self.image_paths.append(
                     self.output_path + "/frame%d.jpg" % count)
             except Exception:
-                print("MB this is the end of the file")
+                print("All images have been saved")
             count += 1
 
     def error(self, h, w, img1, img2):
@@ -63,7 +73,7 @@ class ScreenshotSaver:
         self.error_list = error_list.copy()
         return error_list
 
-    def save_screenshots(self, error_threshold=0.8, sequence_threshold=20):
+    def save_screenshots(self):
         count = 0
         sequence = 0
 
@@ -74,17 +84,18 @@ class ScreenshotSaver:
             os.makedirs(self.screenshots_path)
 
         for error in self.error_list:
-            if error < error_threshold:
+            if error < self.error_threshold:
 
                 sequence += 1
-            if sequence > sequence_threshold:
+            if sequence > self.sequence_threshold:
                 try:
                     sequence = 0
                     img = cv2.imread(self.image_paths[count])
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                     cv2.imwrite(self.screenshots_path +
                                 "/frame%d.jpg" % count, img)
-                    self.screenshots_time.append(count - sequence_threshold)
+                    self.screenshots_time.append(
+                        count - self.sequence_threshold)
                     self.screenshots_paths.append(
                         self.screenshots_path + "/frame%d.jpg" % count)
                 except Exception:
@@ -109,7 +120,7 @@ class ScreenshotSaver:
         for i in range(len(sentences)):
             if sentences[i].get('start') < sentences[indexes[0]].get('start'):
                 str1 += sentences[i].get('text')
-                end  = sentences[i].get('end')
+                end = sentences[i].get('end')
             else:
                 if i > 0:
                     start = sentences[0].get('start')
@@ -119,10 +130,9 @@ class ScreenshotSaver:
                     break
         str1 = ""
 
-        
         k = indexes[0]
-        start_paragraph.extend(indexes.copy())
-        end_paragraph.extend(indexes[1:].copy())
+        start_paragraph.extend([sentences[x].get('start') for x in indexes.copy()])
+        end_paragraph.extend([sentences[x].get('end') for x in indexes[1:].copy()])
         end_paragraph.append(sentences[-1].get('end'))
 
         for index in indexes[1:]:

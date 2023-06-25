@@ -3,17 +3,18 @@ from screenshot import ScreenshotSaver
 from summarizer import create_title
 
 
-video_path = '/home/dima/Downloads/example.mp4'
-word_list = get_timestamped(video_path)
+VIDEO_PATH = '/home/dima/Downloads/test1.mp4'
+word_list = get_timestamped(VIDEO_PATH)
 sentences = get_sentences(word_list)
 
 saver = ScreenshotSaver(
-    video_path=video_path,
+    video_path=VIDEO_PATH,
     output_path="new_data_example",
     screenshots_path='new_screenshots'
 )
 
 out_dict = saver.run_algorithm(sentences=sentences)
 
-titles = [create_title(x.get('text')) for x in out_dict]
+titles = [create_title(x.get('text'), num_return_sequences=2) for x in out_dict]
 
+print(out_dict)
