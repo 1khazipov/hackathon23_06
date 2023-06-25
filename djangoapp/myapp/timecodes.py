@@ -1,12 +1,25 @@
 import whisper_timestamped as whisper
+import torch
 
 
 def get_timestamped(file_path, language='ru'):
     audio = whisper.load_audio(file_path)
 
-    model = whisper.load_model("base", device="cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(device)
+    model = whisper.load_model(
+        "small",
+        in_memory=True,
+        device=device
+    )
 
-    result = whisper.transcribe(model, audio, language=language)
+    result = whisper.transcribe(
+        model,
+        audio,
+        language=language,
+        compute_word_confidence=False,
+    )
+
 
     word_list = []
     for segment in result.get('segments'):

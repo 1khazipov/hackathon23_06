@@ -18,7 +18,7 @@ def ml_entry(source, id,):
 
     out_dict = saver.run_algorithm(sentences=sentences)
 
-    titles = [create_title(x.get('text')) for x in out_dict]
+    [create_title(x.get('text'), num_return_sequences=2) for x in out_dict]
     shutil.rmtree(temp)
 
     #import json
